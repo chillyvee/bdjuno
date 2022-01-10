@@ -19,7 +19,7 @@ func NewActionsCmd(parseCfg *parse.Config) *cobra.Command {
 			// HTTP server for the handler
 			mux := http.NewServeMux()
 			mux.HandleFunc("/account_balances", accountBalancesHandler)
-			// mux.HandleFunc("/total_supply", totalSupplyHandler)
+			mux.HandleFunc("/total_supply", totalSupplyHandler)
 
 			err := http.ListenAndServe(":3000", mux)
 			log.Fatal(err)
