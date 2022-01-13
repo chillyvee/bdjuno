@@ -1,6 +1,9 @@
 package remote
 
 import (
+	"fmt"
+	"time"
+
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
 	"github.com/cosmos/cosmos-sdk/types/query"
@@ -30,6 +33,7 @@ func NewSource(source *remote.Source, querier slashingtypes.QueryClient) *Source
 
 // GetSigningInfos implements slashingsource.Source
 func (s Source) GetSigningInfos(height int64) ([]slashingtypes.ValidatorSigningInfo, error) {
+	timeNow := time.Now()
 	header := remote.GetHeightRequestHeader(height)
 
 	var signingInfos []slashingtypes.ValidatorSigningInfo
@@ -55,21 +59,28 @@ func (s Source) GetSigningInfos(height int64) ([]slashingtypes.ValidatorSigningI
 		signingInfos = append(signingInfos, res.Info...)
 	}
 
+	fmt.Println("Time(Seconds) spent for slashing/ GetSigningInfos: ", time.Since(timeNow).Seconds())
+
 	return signingInfos, nil
 }
 
 // GetParams implements slashingsource.Source
 func (s Source) GetParams(height int64) (slashingtypes.Params, error) {
+	timeNow := time.Now()
+
 	res, err := s.querier.Params(s.Ctx, &slashingtypes.QueryParamsRequest{}, remote.GetHeightRequestHeader(height))
 	if err != nil {
 		return slashingtypes.Params{}, nil
 	}
+	fmt.Println("Time(Seconds) spent for slashing/ GetParams: ", time.Since(timeNow).Seconds())
 
 	return res.Params, nil
 }
 
 // GetSigningInfo implements slashingsource.GetSigningInfo
 func (s Source) GetSigningInfo(height int64, consAddr sdk.ConsAddress) (slashingtypes.ValidatorSigningInfo, error) {
+	timeNow := time.Now()
+
 	res, err := s.querier.SigningInfo(
 		s.Ctx,
 		&slashingtypes.QuerySigningInfoRequest{
@@ -80,5 +91,7 @@ func (s Source) GetSigningInfo(height int64, consAddr sdk.ConsAddress) (slashing
 	if err != nil {
 		return slashingtypes.ValidatorSigningInfo{}, err
 	}
+	fmt.Println("Time(Seconds) spent for slashing/ GetSigningInfo: ", time.Since(timeNow).Seconds())
+
 	return res.ValSigningInfo, nil
 }

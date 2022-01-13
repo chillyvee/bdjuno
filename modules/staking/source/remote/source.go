@@ -2,6 +2,7 @@ package remote
 
 import (
 	"fmt"
+	"time"
 
 	"github.com/cosmos/cosmos-sdk/types/query"
 	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
@@ -30,6 +31,8 @@ func NewSource(source *remote.Source, stakingClient stakingtypes.QueryClient) *S
 
 // GetValidator implements stakingsource.Source
 func (s Source) GetValidator(height int64, valOper string) (stakingtypes.Validator, error) {
+	timeNow := time.Now()
+
 	res, err := s.stakingClient.Validator(
 		s.Ctx,
 		&stakingtypes.QueryValidatorRequest{ValidatorAddr: valOper},
@@ -39,11 +42,15 @@ func (s Source) GetValidator(height int64, valOper string) (stakingtypes.Validat
 		return stakingtypes.Validator{}, fmt.Errorf("error while getting validator: %s", err)
 	}
 
+	fmt.Println("Time(Seconds) spent for staking/ GetValidator: ", time.Since(timeNow).Seconds())
+
 	return res.Validator, nil
 }
 
 // GetValidatorsWithStatus implements stakingsource.Source
 func (s Source) GetValidatorsWithStatus(height int64, status string) ([]stakingtypes.Validator, error) {
+	timeNow := time.Now()
+
 	header := remote.GetHeightRequestHeader(height)
 
 	var validators []stakingtypes.Validator
@@ -70,11 +77,14 @@ func (s Source) GetValidatorsWithStatus(height int64, status string) ([]stakingt
 		validators = append(validators, res.Validators...)
 	}
 
+	fmt.Println("Time(Seconds) spent for staking/ GetValidatorsWithStatus: ", time.Since(timeNow).Seconds())
+
 	return validators, nil
 }
 
 // GetDelegation implements stakingsource.Source
 func (s Source) GetDelegation(height int64, delegator string, valOperAddr string) (stakingtypes.DelegationResponse, error) {
+	timeNow := time.Now()
 	res, err := s.stakingClient.Delegation(
 		s.Ctx,
 		&stakingtypes.QueryDelegationRequest{
@@ -87,11 +97,14 @@ func (s Source) GetDelegation(height int64, delegator string, valOperAddr string
 		return stakingtypes.DelegationResponse{}, err
 	}
 
+	fmt.Println("Time(Seconds) spent for staking/ GetDelegation: ", time.Since(timeNow).Seconds())
+
 	return *res.DelegationResponse, nil
 }
 
 // GetValidatorDelegations implements stakingsource.Source
 func (s Source) GetValidatorDelegations(height int64, validator string) ([]stakingtypes.DelegationResponse, error) {
+	timeNow := time.Now()
 	header := remote.GetHeightRequestHeader(height)
 
 	var delegations []stakingtypes.DelegationResponse
@@ -118,11 +131,14 @@ func (s Source) GetValidatorDelegations(height int64, validator string) ([]staki
 		delegations = append(delegations, res.DelegationResponses...)
 	}
 
+	fmt.Println("Time(Seconds) spent for staking/ GetValidatorDelegations: ", time.Since(timeNow).Seconds())
+
 	return delegations, nil
 }
 
 // GetDelegatorDelegations implements stakingsource.Source
 func (s Source) GetDelegatorDelegations(height int64, delegator string) ([]stakingtypes.DelegationResponse, error) {
+	timeNow := time.Now()
 	header := remote.GetHeightRequestHeader(height)
 
 	var delegations []stakingtypes.DelegationResponse
@@ -149,25 +165,32 @@ func (s Source) GetDelegatorDelegations(height int64, delegator string) ([]staki
 		delegations = append(delegations, res.DelegationResponses...)
 	}
 
+	fmt.Println("Time(Seconds) spent for staking/ GetDelegatorDelegations: ", time.Since(timeNow).Seconds())
+
 	return delegations, nil
 }
 
 // GetPool implements stakingsource.Source
 func (s Source) GetPool(height int64) (stakingtypes.Pool, error) {
+	timeNow := time.Now()
 	res, err := s.stakingClient.Pool(s.Ctx, &stakingtypes.QueryPoolRequest{}, remote.GetHeightRequestHeader(height))
 	if err != nil {
 		return stakingtypes.Pool{}, err
 	}
+	fmt.Println("Time(Seconds) spent for staking/ GetPool: ", time.Since(timeNow).Seconds())
 
 	return res.Pool, nil
 }
 
 // GetParams implements stakingsource.Source
 func (s Source) GetParams(height int64) (stakingtypes.Params, error) {
+	timeNow := time.Now()
 	res, err := s.stakingClient.Params(s.Ctx, &stakingtypes.QueryParamsRequest{}, remote.GetHeightRequestHeader(height))
 	if err != nil {
 		return stakingtypes.Params{}, err
 	}
+
+	fmt.Println("Time(Seconds) spent for staking/ GetParams: ", time.Since(timeNow).Seconds())
 
 	return res.Params, nil
 }

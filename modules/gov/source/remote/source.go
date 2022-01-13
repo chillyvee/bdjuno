@@ -1,6 +1,9 @@
 package remote
 
 import (
+	"fmt"
+	"time"
+
 	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types"
 	"github.com/forbole/juno/v2/node/remote"
 
@@ -27,6 +30,7 @@ func NewSource(source *remote.Source, govClient govtypes.QueryClient) *Source {
 
 // Proposal implements govsource.Source
 func (s Source) Proposal(height int64, id uint64) (govtypes.Proposal, error) {
+	timeNow := time.Now()
 	res, err := s.govClient.Proposal(
 		s.Ctx,
 		&govtypes.QueryProposalRequest{ProposalId: id},
@@ -35,12 +39,15 @@ func (s Source) Proposal(height int64, id uint64) (govtypes.Proposal, error) {
 	if err != nil {
 		return govtypes.Proposal{}, err
 	}
+	fmt.Println("Time(Seconds) spent for gov/ Proposal: ", time.Since(timeNow).Seconds())
 
 	return res.Proposal, err
 }
 
 // ProposalDeposit implements govsource.Source
 func (s Source) ProposalDeposit(height int64, id uint64, depositor string) (govtypes.Deposit, error) {
+	timeNow := time.Now()
+
 	res, err := s.govClient.Deposit(
 		s.Ctx,
 		&govtypes.QueryDepositRequest{ProposalId: id, Depositor: depositor},
@@ -49,12 +56,15 @@ func (s Source) ProposalDeposit(height int64, id uint64, depositor string) (govt
 	if err != nil {
 		return govtypes.Deposit{}, err
 	}
+	fmt.Println("Time(Seconds) spent for gov/ ProposalDeposit: ", time.Since(timeNow).Seconds())
 
 	return res.Deposit, nil
 }
 
 // TallyResult implements govsource.Source
 func (s Source) TallyResult(height int64, proposalID uint64) (govtypes.TallyResult, error) {
+	timeNow := time.Now()
+
 	res, err := s.govClient.TallyResult(
 		s.Ctx,
 		&govtypes.QueryTallyResultRequest{ProposalId: proposalID},
@@ -63,12 +73,15 @@ func (s Source) TallyResult(height int64, proposalID uint64) (govtypes.TallyResu
 	if err != nil {
 		return govtypes.TallyResult{}, err
 	}
+	fmt.Println("Time(Seconds) spent for gov/ TallyResult: ", time.Since(timeNow).Seconds())
 
 	return res.Tally, nil
 }
 
 // DepositParams implements govsource.Source
 func (s Source) DepositParams(height int64) (govtypes.DepositParams, error) {
+	timeNow := time.Now()
+
 	res, err := s.govClient.Params(
 		s.Ctx,
 		&govtypes.QueryParamsRequest{ParamsType: govtypes.ParamDeposit},
@@ -77,12 +90,15 @@ func (s Source) DepositParams(height int64) (govtypes.DepositParams, error) {
 	if err != nil {
 		return govtypes.DepositParams{}, err
 	}
+	fmt.Println("Time(Seconds) spent for gov/ DepositParams: ", time.Since(timeNow).Seconds())
 
 	return res.DepositParams, nil
 }
 
 // VotingParams implements govsource.Source
 func (s Source) VotingParams(height int64) (govtypes.VotingParams, error) {
+	timeNow := time.Now()
+
 	res, err := s.govClient.Params(
 		s.Ctx,
 		&govtypes.QueryParamsRequest{ParamsType: govtypes.ParamVoting},
@@ -91,12 +107,15 @@ func (s Source) VotingParams(height int64) (govtypes.VotingParams, error) {
 	if err != nil {
 		return govtypes.VotingParams{}, err
 	}
+	fmt.Println("Time(Seconds) spent for gov/ VotingParams: ", time.Since(timeNow).Seconds())
 
 	return res.VotingParams, nil
 }
 
 // TallyParams implements govsource.Source
 func (s Source) TallyParams(height int64) (govtypes.TallyParams, error) {
+	timeNow := time.Now()
+
 	res, err := s.govClient.Params(
 		s.Ctx,
 		&govtypes.QueryParamsRequest{ParamsType: govtypes.ParamTallying},
@@ -105,6 +124,7 @@ func (s Source) TallyParams(height int64) (govtypes.TallyParams, error) {
 	if err != nil {
 		return govtypes.TallyParams{}, err
 	}
+	fmt.Println("Time(Seconds) spent for gov/ TallyParams: ", time.Since(timeNow).Seconds())
 
 	return res.TallyParams, nil
 }
