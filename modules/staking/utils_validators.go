@@ -3,6 +3,7 @@ package staking
 import (
 	"fmt"
 	"strings"
+	"time"
 
 	"google.golang.org/grpc/codes"
 
@@ -164,6 +165,8 @@ func (m *Module) updateValidators(height int64) ([]stakingtypes.Validator, error
 // --------------------------------------------------------------------------------------------------------------------
 
 func (m *Module) GetValidatorsStatuses(height int64, validators []stakingtypes.Validator) ([]types.ValidatorStatus, error) {
+	timeNow := time.Now()
+
 	statuses := make([]types.ValidatorStatus, len(validators))
 	for index, validator := range validators {
 		consAddr, err := m.getValidatorConsAddr(validator)
@@ -190,6 +193,8 @@ func (m *Module) GetValidatorsStatuses(height int64, validators []stakingtypes.V
 			height,
 		)
 	}
+
+	fmt.Println("Time(Seconds) spent for staking/ GetValidatorsStatuses (loop): ", time.Since(timeNow).Seconds())
 
 	return statuses, nil
 }

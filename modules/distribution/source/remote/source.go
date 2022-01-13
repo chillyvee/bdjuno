@@ -31,7 +31,6 @@ func NewSource(source *remote.Source, distrClient distrtypes.QueryClient) *Sourc
 
 // ValidatorCommission implements distrsource.Source
 func (s Source) ValidatorCommission(valOperAddr string, height int64) (sdk.DecCoins, error) {
-	timeNow := time.Now()
 	res, err := s.distrClient.ValidatorCommission(
 		s.Ctx,
 		&distrtypes.QueryValidatorCommissionRequest{ValidatorAddress: valOperAddr},
@@ -40,8 +39,6 @@ func (s Source) ValidatorCommission(valOperAddr string, height int64) (sdk.DecCo
 	if err != nil {
 		return nil, err
 	}
-
-	fmt.Println("Time(Seconds) spent for distribution/ ValidatorCommission: ", time.Since(timeNow).Seconds())
 
 	return res.Commission.Commission, nil
 }

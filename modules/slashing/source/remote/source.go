@@ -79,7 +79,6 @@ func (s Source) GetParams(height int64) (slashingtypes.Params, error) {
 
 // GetSigningInfo implements slashingsource.GetSigningInfo
 func (s Source) GetSigningInfo(height int64, consAddr sdk.ConsAddress) (slashingtypes.ValidatorSigningInfo, error) {
-	timeNow := time.Now()
 
 	res, err := s.querier.SigningInfo(
 		s.Ctx,
@@ -91,7 +90,6 @@ func (s Source) GetSigningInfo(height int64, consAddr sdk.ConsAddress) (slashing
 	if err != nil {
 		return slashingtypes.ValidatorSigningInfo{}, err
 	}
-	fmt.Println("Time(Seconds) spent for slashing/ GetSigningInfo: ", time.Since(timeNow).Seconds())
 
 	return res.ValSigningInfo, nil
 }

@@ -1,6 +1,9 @@
 package distribution
 
 import (
+	"fmt"
+	"time"
+
 	"github.com/forbole/bdjuno/v2/types"
 
 	"github.com/rs/zerolog/log"
@@ -25,10 +28,13 @@ func (m *Module) updateValidatorsCommissionAmounts(height int64) {
 		return
 	}
 
+	timeNow := time.Now()
 	// Get all the commissions
 	for _, validator := range validators {
 		go m.updateValidatorCommissionAmount(height, validator)
 	}
+
+	fmt.Println("Time(Seconds) spent for distribution/ updateValidatorsCommissionAmounts (loop): ", time.Since(timeNow).Seconds())
 }
 
 func (m *Module) updateValidatorCommissionAmount(height int64, validator types.Validator) {
