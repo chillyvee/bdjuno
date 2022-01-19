@@ -21,37 +21,44 @@ import (
 func (m *Module) HandleGenesis(doc *tmtypes.GenesisDoc, appState map[string]json.RawMessage) error {
 	log.Debug().Str("module", "staking").Msg("parsing genesis")
 
+	log.Debug().Str("module", "staking").Msg("read genesis")
 	// Read the genesis state
 	var genState stakingtypes.GenesisState
 	err := m.cdc.UnmarshalJSON(appState[stakingtypes.ModuleName], &genState)
+	log.Debug().Str("module", "staking").Msg(fmt.Sprintf("read genesi module %s", stakingtypes.ModuleName))
 	if err != nil {
 		return fmt.Errorf("error while unmarshaling staking state: %s", err)
 	}
 
+	log.Debug().Str("module", "staking").Msg("save params")
 	// Save the params
 	err = m.db.SaveStakingParams(types.NewStakingParams(genState.Params, doc.InitialHeight))
 	if err != nil {
 		return fmt.Errorf("error while storing genesis staking params: %s", err)
 	}
 
+	log.Debug().Str("module", "staking").Msg("parse tx")
 	// Parse genesis transactions
 	err = m.parseGenesisTransactions(doc, appState)
 	if err != nil {
 		return fmt.Errorf("error while storing genesis transactions: %s", err)
 	}
 
+	log.Debug().Str("module", "staking").Msg("save val")
 	// Save the validators
 	err = m.saveValidators(doc, genState.Validators)
 	if err != nil {
 		return fmt.Errorf("error while storing staking genesis validators: %s", err)
 	}
 
+	log.Debug().Str("module", "staking").Msg("save del")
 	// Save the delegations
 	err = m.saveDelegations(doc, genState)
 	if err != nil {
 		return fmt.Errorf("error while storing staking genesis delegations: %s", err)
 	}
 
+	log.Debug().Str("module", "staking").Msg("save unbond")
 	// Save the unbonding delegations
 	err = m.saveUnbondingDelegations(doc, genState)
 	if err != nil {
@@ -115,8 +122,10 @@ func (m *Module) parseGenesisTransactions(doc *tmtypes.GenesisDoc, appState map[
 
 // saveValidators stores the validators data present inside the given genesis state
 func (m *Module) saveValidators(doc *tmtypes.GenesisDoc, validators stakingtypes.Validators) error {
+	log.Debug().Str("module", "staking").Msg(fmt.Sprintf("save validators: start"))
 	vals := make([]types.Validator, len(validators))
 	for i, val := range validators {
+		log.Debug().Str("module", "staking").Msg(fmt.Sprintf("val %v+", val))
 		validator, err := m.convertValidator(doc.InitialHeight, val)
 		if err != nil {
 			return err
@@ -125,6 +134,7 @@ func (m *Module) saveValidators(doc *tmtypes.GenesisDoc, validators stakingtypes
 		vals[i] = validator
 	}
 
+	log.Debug().Str("module", "staking").Msg(fmt.Sprintf("save validators: db launch %v+", vals))
 	return m.db.SaveValidatorsData(vals)
 }
 
